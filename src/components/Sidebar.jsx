@@ -1,23 +1,24 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
+  const [isLogoutOpen, setisLogoutOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const handleLogoutClick = () => {
-    setIsModalOpen(true); // Open confirmation modal
+    setisLogoutOpen(true);
   };
 
   const handleLogoutConfirm = () => {
-    setIsModalOpen(false);
-    // Perform logout action here, e.g., clear auth token, redirect to login page
-    console.log("Logged out");
+    setisLogoutOpen(false);
+    localStorage.removeItem("isAuthenticated"); // Remove session
+    navigate("/login");
   };
 
   const handleLogoutCancel = () => {
-    setIsModalOpen(false); // Close modal if canceled
+    setisLogoutOpen(false);
   };
 
   useEffect(() => {
@@ -39,7 +40,7 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
         isSidebarOpen ? "w-64 items-start" : "w-16 items-center"
       }`}
     >
-      {/* Sidebar Content */}
+      {/* Sidebar Header */}
       <div className="flex items-center justify-center p-4 w-full">
         <div
           className={`flex items-center w-full ${
@@ -109,12 +110,12 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
             {isSidebarOpen && <span className="ml-3">Create User</span>}
           </div>
         </Link>
-        
+
         <div
-          className={`p-3 hover:bg-darkBlue cursor-pointer w-full ${
+          className={`p-3 hover:bg-darkBlue cursor-pointer w-full flex ${
             isSidebarOpen ? "justify-start" : "justify-center"
-          } flex`}
-          onClick={handleLogoutClick} // Open the confirmation modal
+          }`}
+          onClick={handleLogoutClick}
         >
           <i className="bi bi-box-arrow-in-right text-lg"></i>
           {isSidebarOpen && <span className="ml-3">Logout</span>}
@@ -122,10 +123,12 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
       </nav>
 
       {/* Confirmation Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      {isLogoutOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-10">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-lg font-semibold mb-4 text-black">Are you sure you want to logout?</h2>
+            <h2 className="text-lg font-semibold mb-4 text-black">
+              Are you sure you want to logout?
+            </h2>
             <div className="flex justify-between">
               <button
                 onClick={handleLogoutConfirm}
