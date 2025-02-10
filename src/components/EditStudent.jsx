@@ -28,8 +28,8 @@ const EditStudent = ({ isOpen, onClose, student, onSave }) => {
         <label className="block text-sm">Name:</label>
         <input
           type="text"
-          name="name"
-          value={editedStudent?.name || ""}
+          name="username"
+          value={editedStudent?.username || ""}
           onChange={handleChange}
           className="border rounded-md px-3 py-2 w-full mb-2"
         />

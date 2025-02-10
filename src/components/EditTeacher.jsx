@@ -26,11 +26,11 @@ const EditTeacher = ({ isOpen, onClose, teacher, onSave }) => {
         
         {/* Name Field */}
         <label className="block text-sm">Name:</label>
-        <input type="text" name="name" value={editedTeacher?.name || ""} onChange={handleChange} className="border rounded-md px-3 py-2 w-full mb-2" />
+        <input type="text" name="username" value={editedTeacher?.username || ""} onChange={handleChange} className="border rounded-md px-3 py-2 w-full mb-2" />
 
         {/* Title Field */}
-        <label className="block text-sm">Title:</label>
-        <input type="text" name="title" value={editedTeacher?.title || ""} onChange={handleChange} className="border rounded-md px-3 py-2 w-full mb-2" />
+        <label className="block text-sm">Grade:</label>
+        <input type="text" name="grade" value={editedTeacher?.grade || ""} onChange={handleChange} className="border rounded-md px-3 py-2 w-full mb-2" />
 
         {/* Email Field */}
         <label className="block text-sm">Email:</label>

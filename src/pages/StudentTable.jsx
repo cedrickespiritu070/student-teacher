@@ -1,33 +1,54 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DataTable from "react-data-table-component";
-import EditStudent from "../components/EditStudent";  // Replace with the actual component for editing students
-import DeleteConfirmModal from "../components/DeleteConfirmModal"; // Modal for delete confirmation
+import EditStudent from "../components/EditStudent";
+import DeleteConfirmModal from "../components/DeleteConfirmModal";
+import { ref, get, remove, set } from "firebase/database"; // Import 'set' for updating data
+import { db } from "../firebaseConfig";
 
 const StudentTable = () => {
-  const [students, setStudents] = useState([
-    { name: "John Doe", grade: "A", email: "john.doe@example.com", status: "Active" },
-    { name: "Jane Smith", grade: "B", email: "jane.smith@example.com", status: "Inactive" },
-    { name: "Alice Johnson", grade: "C", email: "alice.johnson@example.com", status: "Active" },
-    { name: "Bob Brown", grade: "A", email: "bob.brown@example.com", status: "Active" },
-    { name: "Charlie Davis", grade: "B", email: "charlie.davis@example.com", status: "Inactive" },
-    { name: "Emily Clark", grade: "A", email: "emily.clark@example.com", status: "Active" },
-  ]);
-
+  const [students, setStudents] = useState([]);
   const [filterText, setFilterText] = useState("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState(null);
 
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const studentsRef = ref(db, "Users");
+        const snapshot = await get(studentsRef);
+        const data = snapshot.val();
+
+        if (data) {
+          const studentList = Object.values(data).filter((user) => user.role === "Student");
+          setStudents(studentList);
+        }
+      } catch (error) {
+        console.error("Error fetching students:", error);
+      }
+    };
+
+    fetchStudents();
+  }, []);
+
   const handleEditClick = (student) => {
     setSelectedStudent(student);
     setIsEditModalOpen(true);
   };
 
-  const handleSave = (updatedStudent) => {
-    setStudents((prevStudents) =>
-      prevStudents.map((s) => (s.email === updatedStudent.email ? updatedStudent : s))
-    );
+  const handleSave = async (updatedStudent) => {
+    try {
+      const studentRef = ref(db, `Users/${updatedStudent.userId}`);
+      await set(studentRef, updatedStudent); // Update student data in Firebase
+
+      setStudents((prevStudents) =>
+        prevStudents.map((s) => (s.userId === updatedStudent.userId ? updatedStudent : s))
+      );
+      setIsEditModalOpen(false);
+    } catch (error) {
+      console.error("Error updating student:", error);
+    }
   };
 
   const handleDeleteClick = (student) => {
@@ -35,15 +56,27 @@ const StudentTable = () => {
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    setStudents((prevStudents) => prevStudents.filter((s) => s.email !== studentToDelete.email));
-    setIsDeleteModalOpen(false);
+  const handleConfirmDelete = async () => {
+    if (studentToDelete) {
+      try {
+        const studentRef = ref(db, `Users/${studentToDelete.userId}`);
+        await remove(studentRef);
+
+        setStudents((prevStudents) =>
+          prevStudents.filter((s) => s.userId !== studentToDelete.userId)
+        );
+        setIsDeleteModalOpen(false);
+      } catch (error) {
+        console.error("Error deleting student:", error);
+      }
+    }
   };
 
   const columns = [
-    { name: "Name", selector: (row) => row.name, sortable: true },
-    { name: "Grade", selector: (row) => row.grade, sortable: true },
+    { name: "User ID", selector: (row) => row.userId, sortable: true },
+    { name: "Username", selector: (row) => row.username, sortable: true },
     { name: "Email", selector: (row) => row.email, sortable: true },
+    { name: "Grade", selector: (row) => row.grade, sortable: true },
     { name: "Status", selector: (row) => row.status, sortable: true },
     {
       name: "Action",
@@ -61,9 +94,9 @@ const StudentTable = () => {
 
   const filteredData = students.filter(
     (student) =>
-      student.name.toLowerCase().includes(filterText.toLowerCase()) ||
-      student.grade.toLowerCase().includes(filterText.toLowerCase()) ||
+      student.username.toLowerCase().includes(filterText.toLowerCase()) || // Changed from username to name
       student.email.toLowerCase().includes(filterText.toLowerCase()) ||
+      student.grade.toLowerCase().includes(filterText.toLowerCase()) ||
       student.status.toLowerCase().includes(filterText.toLowerCase())
   );
 
@@ -71,8 +104,6 @@ const StudentTable = () => {
     <div className="p-4">
       <div className="flex justify-between flex-wrap">
         <h1 className="text-2xl font-semibold mb-4">Students Table</h1>
-
-        {/* Search Input */}
         <input
           type="text"
           placeholder="Search..."
@@ -82,13 +113,12 @@ const StudentTable = () => {
         />
       </div>
 
-      {/* Display "No results found" if there are no filtered results */}
       {filteredData.length === 0 ? (
         <p>No results found</p>
       ) : (
         <DataTable
           columns={columns}
-          data={filteredData.length > 0 ? filteredData : students} // Use filtered data if available, otherwise show all students
+          data={filteredData}
           pagination
           highlightOnHover
           responsive
@@ -96,7 +126,6 @@ const StudentTable = () => {
         />
       )}
 
-      {/* Edit Modal */}
       {isEditModalOpen && (
         <EditStudent
           isOpen={isEditModalOpen}
@@ -106,13 +135,12 @@ const StudentTable = () => {
         />
       )}
 
-      {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
         <DeleteConfirmModal
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={handleConfirmDelete}
-          studentName={studentToDelete?.name}
+          studentName={studentToDelete?.name} // Changed from username to name
         />
       )}
     </div>

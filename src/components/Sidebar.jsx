@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import Logo from "../assets/kainoslogo.png";
 
 function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
   const [isLogoutOpen, setisLogoutOpen] = useState(false);
@@ -47,13 +48,13 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
             isSidebarOpen ? "justify-between" : "justify-center"
           }`}
         >
-          {isSidebarOpen && <span className="ml-3">Logo Here</span>}
           <span>
             <i
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="bi bi-list text-2xl cursor-pointer"
             ></i>
           </span>
+          {isSidebarOpen && <img src={Logo} className="ml-3" alt="Logo" />}
         </div>
       </div>
 
@@ -108,6 +109,20 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
           >
             <i className="bi bi-person-plus text-lg"></i>
             {isSidebarOpen && <span className="ml-3">Create User</span>}
+          </div>
+        </Link>
+
+        {/* Create Announcement Link */}
+        <Link to="/create-announcement" className="block w-full">
+          <div
+            className={`flex items-center p-3 w-full ${
+              location.pathname === "/create-announcement"
+                ? "text-lightBlue bg-darkBlue"
+                : "hover:bg-darkBlue"
+            } ${isSidebarOpen ? "justify-start" : "justify-center"}`}
+          >
+            <i className="bi bi-megaphone text-lg"></i>
+            {isSidebarOpen && <span className="ml-3">Create Announcement</span>}
           </div>
         </Link>
 
