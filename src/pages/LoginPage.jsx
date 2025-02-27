@@ -4,6 +4,8 @@ import { auth, db } from "../firebaseConfig";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { ref, set } from "firebase/database";
 import Logo from "../assets/kainoslogo.png"
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 
 
 const AuthPage = () => {
@@ -13,6 +15,9 @@ const AuthPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [username, setUsername] = useState(""); // Added username state
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const navigate = useNavigate();
 
   const handleAuth = async (e) => {
@@ -99,30 +104,56 @@ const AuthPage = () => {
             </>
           )}
 
-          <div className="mb-3">
-            <label className="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+        <div className="mb-3 relative">
+              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none pr-10"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-3 flex items-center text-primaryBlue"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <FaEyeSlash className="w-5 h-5" />
+                  ) : (
+                    <FaEye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
 
           {!isLogin && (
             <>
             
-              <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
-                <input
-                  type="password"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-              </div>
+            <div className="mb-3 relative">
+        <label className="block text-sm font-medium text-gray-700">Confirm Password</label>
+        <div className="relative">
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            className="w-full px-3 py-2 border rounded-md focus:outline-none pr-10"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-3 flex items-center text-primaryBlue"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {showConfirmPassword ? (
+              <FaEyeSlash className="w-5 h-5" />
+            ) : (
+              <FaEye className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+      </div>
             </>
           )}
 
