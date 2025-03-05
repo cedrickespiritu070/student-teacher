@@ -4,8 +4,8 @@ import Modal from "react-modal";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { auth, db } from "../firebaseConfig"; 
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { ref, set, push, serverTimestamp } from "firebase/database"; 
+import { createUserWithEmailAndPassword, updatePassword } from "firebase/auth";
+import { ref, set, push, serverTimestamp } from "firebase/database";
 
 Modal.setAppElement("#root");
 
@@ -19,6 +19,21 @@ const CreateUser = () => {
   const [role, setRole] = useState("");
   const [grade, setGrade] = useState(""); 
   const [status, setStatus] = useState(""); // Only for students
+
+  // Function to handle username change and automatically set email
+  const handleUsernameChange = (e) => {
+    const newUsername = e.target.value; // Allow spaces and capital letters in username
+    setUsername(newUsername);
+    // Automatically set email based on username (lowercase and no spaces)
+    if (newUsername) {
+      setEmail(`${newUsername.replace(/\s+/g, "").toLowerCase()}@kainos.com`);
+    } else {
+      setEmail(""); // Clear email when username is empty
+    }
+  };
+  
+  
+  
 
   const handleCreateUser = () => {
     if (password !== confirmPassword) {
@@ -38,6 +53,7 @@ const CreateUser = () => {
         username,
         email,
         role,
+        password,
         grade: grade, // Save grade for both students and teachers
         status: role === "Student" ? status : "", // Status only for students
         userId: user.uid,
@@ -72,6 +88,25 @@ const CreateUser = () => {
     setRole("");
     setGrade("");
     setStatus("");
+  };
+
+  const handleEditPassword = async () => {
+    try {
+      if (password !== confirmPassword) {
+        toast.error("Passwords do not match!");
+        return;
+      }
+
+      const user = auth.currentUser;
+      if (user) {
+        await updatePassword(user, password);
+        toast.success("Password updated successfully!");
+        setPassword("");
+        setConfirmPassword("");
+      }
+    } catch (error) {
+      toast.error(`Error: ${error.message}`);
+    }
   };
 
   return (
@@ -130,7 +165,7 @@ const CreateUser = () => {
               <input
                 type="text"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={handleUsernameChange} // Update email when username changes
                 className="w-full border px-4 py-2 rounded-md"
               />
             </div>
@@ -140,7 +175,7 @@ const CreateUser = () => {
               <input
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                readOnly
                 className="w-full border px-4 py-2 rounded-md"
               />
             </div>

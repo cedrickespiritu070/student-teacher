@@ -1,29 +1,93 @@
 import React from "react";
 import Modal from "react-modal";
+import { auth } from "../firebaseConfig"; // Import Firebase auth methods
+import { updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth"; // Firebase methods
+import { toast } from "react-toastify"; // Import toast from react-toastify
+import "react-toastify/dist/ReactToastify.css"; // Import the CSS
 
-Modal.setAppElement("#root"); // To avoid accessibility warnings
+Modal.setAppElement("#root");
 
 const EditStudent = ({ isOpen, onClose, student, onSave }) => {
   const [editedStudent, setEditedStudent] = React.useState(student);
+  const [password, setPassword] = React.useState(""); // Store current password for reauthentication
+  const [newPassword, setNewPassword] = React.useState(""); // Store new password field
+  const [confirmNewPassword, setConfirmNewPassword] = React.useState(""); // Confirm new password
 
   React.useEffect(() => {
-    setEditedStudent(student); // Update modal data when student changes
+    setEditedStudent(student);
   }, [student]);
 
   const handleChange = (e) => {
     setEditedStudent({ ...editedStudent, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    onSave(editedStudent);
-    onClose(); // Close modal after saving
+  const handleSave = async () => {
+    try {
+      const user = auth.currentUser;
+      
+      // Log the current password input by the user
+      console.log("User current password:", password);
+  
+      // Check if passwords match
+      if (newPassword && newPassword !== confirmNewPassword) {
+        toast.error("New passwords do not match!");
+        return;
+      }
+  
+      // Re-authenticate the user with their current password before making changes
+      if (newPassword) {
+        if (!password) {
+          toast.error("Current password is required for changes.");
+          return;
+        }
+        
+        // Log the current email for reauthentication
+        console.log("User email:", user.email);
+        
+        const credential = EmailAuthProvider.credential(user.email, password);
+        await reauthenticateWithCredential(user, credential);
+        toast.success("Reauthenticated successfully!"); // Success toast for reauthentication
+  
+        // Log reauthentication success
+        console.log("Reauthenticated successfully!");
+  
+        // Update the password if provided
+        await updatePassword(user, newPassword);
+        toast.success("Password updated successfully!"); // Success toast on password update
+        console.log("Password updated successfully!");
+      }
+  
+      // Update the email if it has changed
+      if (editedStudent.email !== user.email) {
+        await updateEmail(user, editedStudent.email);
+        toast.success("Email updated successfully!"); // Success toast for email update
+        console.log("Email updated to:", editedStudent.email);
+      }
+  
+      // Save user data to the database (Assuming `onSave` handles saving non-auth info)
+      onSave(editedStudent);
+  
+      // Close the modal after saving
+      onClose();
+      toast.success("Student information updated successfully!"); // Success toast on saving student info
+  
+    } catch (error) {
+      console.error("Error updating user:", error);
+      if (error.code === "auth/requires-recent-login") {
+        toast.error("You need to log in again to update your credentials.");
+      } else {
+        toast.error("Error updating user. Please try again."); // Error toast if something goes wrong
+      }
+    }
   };
+  
+  
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-6 rounded-md shadow-lg w-96">
         <h2 className="text-lg font-semibold mb-4">Edit Student</h2>
-        
+
         {/* Name Field */}
         <label className="block text-sm">Name:</label>
         <input
@@ -61,6 +125,36 @@ const EditStudent = ({ isOpen, onClose, student, onSave }) => {
           name="status"
           value={editedStudent?.status || ""}
           onChange={handleChange}
+          className="border rounded-md px-3 py-2 w-full mb-2"
+        />
+
+        {/* Password Field for reauthentication */}
+        <label className="block text-sm">Current Password (Required for changes):</label>
+        <input
+          type="password"
+          name="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="border rounded-md px-3 py-2 w-full mb-2"
+        />
+
+        {/* New Password Field */}
+        <label className="block text-sm">New Password (Leave blank to keep current password):</label>
+        <input
+          type="password"
+          name="newPassword"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          className="border rounded-md px-3 py-2 w-full mb-2"
+        />
+
+        {/* Confirm New Password Field */}
+        <label className="block text-sm">Confirm New Password:</label>
+        <input
+          type="password"
+          name="confirmNewPassword"
+          value={confirmNewPassword}
+          onChange={(e) => setConfirmNewPassword(e.target.value)}
           className="border rounded-md px-3 py-2 w-full mb-2"
         />
 
