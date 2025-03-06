@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import Modal from "react-modal";
 import { auth } from "../firebaseConfig"; // Import Firebase auth methods
 import { updateEmail, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth"; // Firebase methods
-import { toast } from "react-toastify"; // Import toast from react-toastify
+import { toast, ToastContainer} from "react-toastify"; // Import toast from react-toastify
 import "react-toastify/dist/ReactToastify.css"; // Import the CSS
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
+
 
 Modal.setAppElement("#root");
 
@@ -12,6 +14,9 @@ const EditStudent = ({ isOpen, onClose, student, onSave }) => {
   const [password, setPassword] = React.useState(""); // Store current password for reauthentication
   const [newPassword, setNewPassword] = React.useState(""); // Store new password field
   const [confirmNewPassword, setConfirmNewPassword] = React.useState(""); // Confirm new password
+  const [showPassword, setShowPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
   React.useEffect(() => {
     setEditedStudent(student);
@@ -19,6 +24,11 @@ const EditStudent = ({ isOpen, onClose, student, onSave }) => {
 
   const handleChange = (e) => {
     setEditedStudent({ ...editedStudent, [e.target.name]: e.target.value });
+  };
+  const togglePasswordVisibility = (field) => {
+    if (field === "password") setShowPassword(!showPassword);
+    if (field === "newPassword") setShowNewPassword(!showNewPassword);
+    if (field === "confirmNewPassword") setShowConfirmNewPassword(!showConfirmNewPassword);
   };
 
   const handleSave = async () => {
@@ -128,35 +138,50 @@ const EditStudent = ({ isOpen, onClose, student, onSave }) => {
           className="border rounded-md px-3 py-2 w-full mb-2"
         />
 
-        {/* Password Field for reauthentication */}
-        <label className="block text-sm">Current Password (Required for changes):</label>
-        <input
-          type="password"
-          name="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="border rounded-md px-3 py-2 w-full mb-2"
-        />
-
-        {/* New Password Field */}
-        <label className="block text-sm">New Password (Leave blank to keep current password):</label>
-        <input
-          type="password"
-          name="newPassword"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          className="border rounded-md px-3 py-2 w-full mb-2"
-        />
-
-        {/* Confirm New Password Field */}
-        <label className="block text-sm">Confirm New Password:</label>
-        <input
-          type="password"
-          name="confirmNewPassword"
-          value={confirmNewPassword}
-          onChange={(e) => setConfirmNewPassword(e.target.value)}
-          className="border rounded-md px-3 py-2 w-full mb-2"
-        />
+       {/* Password Field for reauthentication */}
+             <label className="block text-sm">Current Password (Required for changes):</label>
+               <div className="relative">
+                 <input
+                   type={showPassword ? "text" : "password"}
+                   name="password"
+                   value={password}
+                   onChange={(e) => setPassword(e.target.value)}
+                   className="border rounded-md px-3 py-2 w-full mb-2 pr-10"
+                 />
+                 <span className="absolute right-3 top-3 cursor-pointer" onClick={() => togglePasswordVisibility("password")}>
+                   {showPassword ? <FaEyeSlash /> : <FaEye />}
+                 </span>
+               </div>
+       
+               {/* New Password Field */}
+               <label className="block text-sm">New Password (Leave blank to keep current password):</label>
+               <div className="relative">
+                 <input
+                   type={showNewPassword ? "text" : "password"}
+                   name="newPassword"
+                   value={newPassword}
+                   onChange={(e) => setNewPassword(e.target.value)}
+                   className="border rounded-md px-3 py-2 w-full mb-2 pr-10"
+                 />
+                 <span className="absolute right-3 top-3 cursor-pointer" onClick={() => togglePasswordVisibility("newPassword")}>
+                   {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                 </span>
+               </div>
+       
+               {/* Confirm New Password Field */}
+               <label className="block text-sm">Confirm New Password:</label>
+               <div className="relative">
+                 <input
+                   type={showConfirmNewPassword ? "text" : "password"}
+                   name="confirmNewPassword"
+                   value={confirmNewPassword}
+                   onChange={(e) => setConfirmNewPassword(e.target.value)}
+                   className="border rounded-md px-3 py-2 w-full mb-2 pr-10"
+                 />
+                 <span className="absolute right-3 top-3 cursor-pointer" onClick={() => togglePasswordVisibility("confirmNewPassword")}>
+                   {showConfirmNewPassword ? <FaEyeSlash /> : <FaEye />}
+                 </span>
+               </div>
 
         {/* Buttons */}
         <div className="flex justify-end gap-2 mt-4">
@@ -164,8 +189,12 @@ const EditStudent = ({ isOpen, onClose, student, onSave }) => {
           <button onClick={handleSave} className="px-4 py-2 bg-primaryBlue text-white rounded-md">Save</button>
         </div>
       </div>
+      <ToastContainer/>
+
     </Modal>
+
   );
+
 };
 
 export default EditStudent;

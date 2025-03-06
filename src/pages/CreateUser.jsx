@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaUserAlt, FaChalkboardTeacher } from "react-icons/fa";
+import { FaUserAlt, FaChalkboardTeacher,FaEye, FaEyeSlash } from "react-icons/fa";
 import Modal from "react-modal";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -20,6 +20,9 @@ const CreateUser = () => {
   const [grade, setGrade] = useState(""); 
   const [status, setStatus] = useState(""); // Only for students
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   // Function to handle username change and automatically set email
   const handleUsernameChange = (e) => {
     const newUsername = e.target.value; // Allow spaces and capital letters in username
@@ -31,7 +34,10 @@ const CreateUser = () => {
       setEmail(""); // Clear email when username is empty
     }
   };
-  
+  const togglePasswordVisibility = (field) => {
+    if (field === "password") setShowPassword((prev) => !prev);
+    if (field === "confirmPassword") setShowConfirmPassword((prev) => !prev);
+  };
   
   
 
@@ -180,24 +186,37 @@ const CreateUser = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium mb-2">Password</label>
+            <div className="relative">
+              <label className="block text-sm font-medium mb-2">New Password</label>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
+                name="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full border px-4 py-2 rounded-md"
+                className="border rounded-md px-3 py-2 w-full mb-2 pr-10"
               />
+              <span
+                className="absolute right-3 top-10  cursor-pointer "
+                onClick={() => togglePasswordVisibility("password")}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
             </div>
 
-            <div>
+            <div className="relative">
               <label className="block text-sm font-medium mb-2">Confirm Password</label>
               <input
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full border px-4 py-2 rounded-md"
+                className="w-full border px-4 py-2 rounded-md pr-10"
               />
+              <span
+                className="absolute right-3 top-10 cursor-pointer"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
             </div>
 
             {/* Grade Dropdown (For Students and Teachers) */}
