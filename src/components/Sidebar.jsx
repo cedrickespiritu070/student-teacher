@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import Logo from "../assets/kainoslogo.png";
+import Logo from "../assets/commonsense.png";
 
 function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
   const [isLogoutOpen, setisLogoutOpen] = useState(false);
@@ -54,7 +54,7 @@ function Sidebar({ isSidebarOpen, setIsSidebarOpen }) {
               className="bi bi-list text-2xl cursor-pointer"
             ></i>
           </span>
-          {isSidebarOpen && <img src={Logo} className="ml-3" alt="Logo" />}
+          {isSidebarOpen && <img src={Logo} className="ml-0" alt="Logo" />}
         </div>
       </div>
 

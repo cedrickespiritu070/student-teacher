@@ -45,29 +45,49 @@ function CreateAnnouncement() {
     });
 
     // Create announcement for Grade 11
-    const newAnnouncementG11 = {
+    const newAnnouncementG7 = {
       title,
       description,
       announcementDate,
       dateCreated,
-      grade: "Grade 11",
+      grade: "Grade 7",
       teacherId: user.uid,
     };
 
     // Create announcement for Grade 12
-    const newAnnouncementG12 = {
+    const newAnnouncementG8 = {
       title,
       description,
       announcementDate,
       dateCreated,
-      grade: "Grade 12",
+      grade: "Grade 8",
+      teacherId: user.uid,
+    };
+    const newAnnouncementG9 = {
+      title,
+      description,
+      announcementDate,
+      dateCreated,
+      grade: "Grade 9",
+      teacherId: user.uid,
+    };
+
+    // Create announcement for Grade 12
+    const newAnnouncementG10 = {
+      title,
+      description,
+      announcementDate,
+      dateCreated,
+      grade: "Grade 10",
       teacherId: user.uid,
     };
 
     try {
       // Push both Grade 11 and Grade 12 announcements to Firebase
-      await push(ref(db, "Announcements"), newAnnouncementG11);
-      await push(ref(db, "Announcements"), newAnnouncementG12);
+      await push(ref(db, "Announcements"), newAnnouncementG7);
+      await push(ref(db, "Announcements"), newAnnouncementG8);
+      await push(ref(db, "Announcements"), newAnnouncementG9);
+      await push(ref(db, "Announcements"), newAnnouncementG10);
       toast.success("Announcements created successfully!");
       setTitle("");
       setDescription("");

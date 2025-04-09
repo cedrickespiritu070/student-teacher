@@ -29,7 +29,7 @@ const CreateUser = () => {
     setUsername(newUsername);
     // Automatically set email based on username (lowercase and no spaces)
     if (newUsername) {
-      setEmail(`${newUsername.replace(/\s+/g, "").toLowerCase()}@kainos.com`);
+      setEmail(`${newUsername.replace(/\s+/g, "").toLowerCase()}@commonsense.com`);
     } else {
       setEmail(""); // Clear email when username is empty
     }
@@ -228,8 +228,10 @@ const CreateUser = () => {
                 className="w-full border px-4 py-2 rounded-md"
               >
                 <option value="">Select Grade Level</option>
-                <option value="Grade 11">Grade 11</option>
-                <option value="Grade 12">Grade 12</option>
+                <option value="Grade 7">Grade 7</option>
+                <option value="Grade 8">Grade 8</option>
+                <option value="Grade 9">Grade 9</option>
+                <option value="Grade 10">Grade 10</option>
               </select>
             </div>
 
