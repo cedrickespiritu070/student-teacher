@@ -50,19 +50,18 @@ const AuthPage = () => {
           password
         );
         const user = userCredential.user;
-
+      
         // Store user details in Firebase Realtime Database
         await set(ref(db, `Users/${user.uid}`), {
           userId: user.uid,
           email: email,
-          username: username, // Store username
-          role: "Admin", // Automatic Admin role
-          grade: "", // Optional
+          username: username,
+          role: "Admin",
+          grade: "",
         });
-
-        // Set authentication status to localStorage
-        localStorage.setItem("isAuthenticated", "true");
-        navigate("/dashboard"); // Redirect to the Dashboard page after sign-up
+      
+        setIsLogin(true); // Switch to login mode
+        setError("Sign up successful! Please log in."); // Optional message
       }
     } catch (error) {
       setError(error.message);
